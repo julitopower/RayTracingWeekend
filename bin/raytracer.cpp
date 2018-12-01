@@ -1,13 +1,21 @@
-#include <raytracing.hpp>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+
+#include <ray.hpp>
+#include <raytracing.hpp>
 #include <vector.hpp>
+
+rt::Vector3f free_ray_color(const rt::Ray r) {
+  const rt::Vector3f dir = rt::unit_vector(r.dir());
+  auto t = float{0.5f * (dir.y() + 1.0f)};
+  return (1.0 - t) * rt::Vector3f{1.0, 1.0, 1.0} + t * rt::Vector3f{0.5, 0.7, 1.0};
+}
 
 void write_header(std::ostream& os, uint16_t width, uint16_t height) {
   os << "P3" << std::endl << width << " " << height << std::endl <<  "255" << std::endl;  
 }
 
-void demo_draw(uint16_t width, uint16_t height, const std::string& filepath) {
+void demo_draw_gradient(uint16_t width, uint16_t height, const std::string& filepath) {
   const auto CONV = 255.99f;
   std::ofstream os{filepath};
   const auto b = float{0.2f};
@@ -28,7 +36,33 @@ void demo_draw(uint16_t width, uint16_t height, const std::string& filepath) {
   }
 }
 
+void demo_draw_background(uint16_t width, uint16_t height, const std::string& filepath) {
+  const auto CONV = 255.99f;
+  std::ofstream os{filepath};
+  write_header(os, width, height);
+
+  const rt::Vector3f origin{0.0, 0.0, 0.0};
+  const rt::Vector3f horizontal_span{4.0, 0.0, 0.0};
+  const rt::Vector3f vertical_span{0.0, 2.0, 0.0};
+  const rt::Vector3f lower_leftt_corner{-2.0, -1.0, -1.0};
+
+  for (auto i = height - 1 ; i >= 0 ; --i) {
+    for (auto j = 0U; j < width; ++j) {
+      auto u = static_cast<float>(j) / width;      
+      auto v = static_cast<float>(i) / height;
+
+      rt::Ray r{origin, lower_leftt_corner + u * horizontal_span + v * vertical_span};
+      rt::Vector3f color = free_ray_color(r);
+      os  << static_cast<int>(color.r() * CONV) << " "
+          << static_cast<int>(color.g() * CONV) << " "
+          << static_cast<int>(color.b() * CONV) << " ";      
+    }
+    os << std::endl;
+  }
+}
+
 int main(int argc, char** argv) {
   std::cout << "Hello Wordl" << std::endl;
-  demo_draw(800, 600, "image.ppm");
+  demo_draw_gradient(800, 600, "image.ppm");
+  demo_draw_background(800, 600, "image2.ppm");
 }
