@@ -5,12 +5,6 @@
 #include <raytracing.hpp>
 #include <vector.hpp>
 
-rt::Vector3f free_ray_color(const rt::Ray r) {
-  const rt::Vector3f dir = rt::unit_vector(r.dir());
-  auto t = float{0.5f * (dir.y() + 1.0f)};
-  return (1.0 - t) * rt::Vector3f{1.0, 1.0, 1.0} + t * rt::Vector3f{0.5, 0.7, 1.0};
-}
-
 void write_header(std::ostream& os, uint16_t width, uint16_t height) {
   os << "P3" << std::endl << width << " " << height << std::endl <<  "255" << std::endl;  
 }
@@ -52,7 +46,7 @@ void demo_draw_background(uint16_t width, uint16_t height, const std::string& fi
       auto v = static_cast<float>(i) / height;
 
       rt::Ray r{origin, lower_leftt_corner + u * horizontal_span + v * vertical_span};
-      rt::Vector3f color = free_ray_color(r);
+      rt::Vector3f color = rt::free_ray_color(r);
       os  << static_cast<int>(color.r() * CONV) << " "
           << static_cast<int>(color.g() * CONV) << " "
           << static_cast<int>(color.b() * CONV) << " ";      
@@ -63,6 +57,6 @@ void demo_draw_background(uint16_t width, uint16_t height, const std::string& fi
 
 int main(int argc, char** argv) {
   std::cout << "Hello Wordl" << std::endl;
-  demo_draw_gradient(800, 600, "image.ppm");
-  demo_draw_background(800, 600, "image2.ppm");
+  demo_draw_gradient(800, 400, "image.ppm");
+  demo_draw_background(800, 400, "image2.ppm");
 }
