@@ -171,9 +171,9 @@ inline Vector3f& Vector3f::operator*=(float t) {
 
 inline Vector3f& Vector3f::operator/=(float t) {
   const auto k = float{1.0f/t};
-  v_[0] /= k;
-  v_[1] /= k;
-  v_[2] /= k;
+  v_[0] *= k;
+  v_[1] *= k;
+  v_[2] *= k;
   return *this;
 }
 
