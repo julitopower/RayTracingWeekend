@@ -12,7 +12,7 @@ class Vector3f {
    * \brief Default constructor
    */
   explicit Vector3f() {}
-  
+
   /*!
    * \brief Initializes the vector components
    */
@@ -22,11 +22,11 @@ class Vector3f {
   const float& x() const { return v_[0]; }
   const float& y() const { return v_[1]; }
   const float& z() const { return v_[2]; }
-  
+
   // View components as colors
   const float& r() const { return v_[0]; }
   const float& g() const { return v_[1]; }
-  const float& b() const { return v_[2]; }    
+  const float& b() const { return v_[2]; }
 
   /*!
    * \brief Prefix+ is basically a no-op
@@ -43,7 +43,7 @@ class Vector3f {
    * Bounds are not checked
    */
   float operator[](int i) const { return v_[i]; };
-  float& operator[](int i)  { return v_[i]; };  
+  float& operator[](int i)  { return v_[i]; };
 
   // More mutating operators
   Vector3f& operator+=(const Vector3f& rhs);
@@ -64,7 +64,7 @@ class Vector3f {
    * \brief Square of length
    */
   float squared_length() {
-    return v_[0] * v_[0] + v_[1] * v_[1] + v_[2] * v_[2];
+    return (v_[0] * v_[0]) + (v_[1] * v_[1]) + (v_[2] * v_[2]);
   }
 
   /*
@@ -73,7 +73,7 @@ class Vector3f {
   void make_unit_vector();
 
   friend std::istream& operator>>(std::istream& is, Vector3f& v);
-  friend std::ostream& operator<<(std::ostream& os, Vector3f& v);  
+  friend std::ostream& operator<<(std::ostream& os, const Vector3f& v);
  private:
   float v_[3];
 };
@@ -83,8 +83,8 @@ inline std::istream& operator>>(std::istream& is, Vector3f& v) {
   return is;
 }
 
-inline std::ostream& operator<<(std::ostream& os, Vector3f& v) {
-  os << v.v_[0] << v.v_[1] << v.v_[2];
+inline std::ostream& operator<<(std::ostream& os, const Vector3f& v) {
+  os << v.x() << " " << v.y() << " " << v.z();
   return os;
 }
 
@@ -123,7 +123,7 @@ inline Vector3f operator*(float t, const Vector3f& rhs) {
 
 
 inline float dot(const Vector3f& lhs, const Vector3f& rhs) {
-  return lhs.x() * rhs.x() + lhs.y() * rhs.y() + lhs.z() * rhs.z();
+  return (lhs.x() * rhs.x()) + (lhs.y() * rhs.y()) + (lhs.z() * rhs.z());
 }
 
 inline Vector3f cross(const Vector3f& lhs, const Vector3f& rhs) {
@@ -170,7 +170,7 @@ inline Vector3f& Vector3f::operator*=(float t) {
 }
 
 inline Vector3f& Vector3f::operator/=(float t) {
-  const auto k = float{1.0f/t};
+  const auto k = float{1.0f / t};
   v_[0] *= k;
   v_[1] *= k;
   v_[2] *= k;
@@ -182,7 +182,5 @@ inline Vector3f unit_vector(Vector3f v) {
 }
 
 }
-
-
 
 #endif // VECTOR_HPP

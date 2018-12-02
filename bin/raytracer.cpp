@@ -12,7 +12,7 @@
 
 
 void write_header(std::ostream& os, uint16_t width, uint16_t height) {
-  os << "P3" << std::endl << width << " " << height << std::endl <<  "255" << std::endl;  
+  os << "P3" << std::endl << width << " " << height << std::endl <<  "255" << std::endl;
 }
 
 void demo_draw_gradient(uint16_t width, uint16_t height, const std::string& filepath) {
@@ -20,7 +20,7 @@ void demo_draw_gradient(uint16_t width, uint16_t height, const std::string& file
   std::ofstream os{filepath};
   const auto b = float{0.2f};
   write_header(os, width, height);
-  
+
   for (auto i = 0U ; i < height ; ++i) {
     for (auto j = 0U; j < width; ++j) {
       auto v = rt::Vector3f{
@@ -48,22 +48,23 @@ void render(uint16_t width,
 
   auto dis = std::uniform_real_distribution<>{0.0, 1.0};
   std::random_device device;
-  
+
   for (auto i = height - 1 ; i >= 0 ; --i) {
     for (auto j = 0U; j < width; ++j) {
       rt::Vector3f color{0, 0, 0};
       for (auto a = 0U ; a < anti_alias ; ++a) {
 
-        auto u = static_cast<float>(j + dis(device)) / width;      
+        auto u = static_cast<float>(j + dis(device)) / width;
         auto v = static_cast<float>(i + dis(device)) / height;
 
         auto r = cam.ray(u,v);
         color += rt::ray_color(r, world);
       }
       color /= static_cast<float>(anti_alias);
-      os  << static_cast<int>(color.r() * CONV) << " "
-          << static_cast<int>(color.g() * CONV) << " "
-          << static_cast<int>(color.b() * CONV) << " ";            
+      color = rt::Vector3f{float(sqrt(color.x())), float(sqrt(color.y())), float(sqrt(color.z()))};
+      os  << static_cast<int>(color.x() * CONV) << " "
+          << static_cast<int>(color.y() * CONV) << " "
+          << static_cast<int>(color.z() * CONV) << " ";
     }
     os << std::endl;
   }

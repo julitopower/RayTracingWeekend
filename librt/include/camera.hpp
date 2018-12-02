@@ -8,7 +8,7 @@ namespace rt {
 class Camera {
  public:
   Ray ray(float u, float v) const {
-    return rt::Ray{origin_, lower_left_corner_ +
+    return Ray{origin_, lower_left_corner_ +
           u * horizontal_span_ + v * vertical_span_}; 
   }
  private:
