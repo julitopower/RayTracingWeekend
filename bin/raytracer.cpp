@@ -9,6 +9,7 @@
 #include <raytracing.hpp>
 #include <vector.hpp>
 #include <sphere.hpp>
+#include <material.hpp>
 
 
 void write_header(std::ostream& os, uint16_t width, uint16_t height) {
@@ -58,7 +59,7 @@ void render(uint16_t width,
         auto v = static_cast<float>(i + dis(device)) / height;
 
         auto r = cam.ray(u,v);
-        color += rt::ray_color(r, world);
+        color += rt::ray_color(r, world, 0);
       }
       color /= static_cast<float>(anti_alias);
       color = rt::Vector3f{float(sqrt(color.x())), float(sqrt(color.y())), float(sqrt(color.z()))};
@@ -76,10 +77,26 @@ int main(int argc, char** argv) {
   // Generate a gradient color image
   demo_draw_gradient(800, 400, "image.ppm");
 
+  // Register materials in the materials registry
+  rt::MaterialRegistry materials{};
+  materials.register_lambertian("ballgreen", {0.8, 0.8, 0});
+  materials.register_lambertian("ballsalmon", {0.8, 0.3, 0.3});
+  materials.register_metal("mirror", {0.8, 1, 0.5});
+  
   // Populate a world with Spheres
   rt::HitableList::HitablePtr worldVector;
-  worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{0, 0, -1}, 0.5));
-  worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{0, -100.5, -1}, 100));
+  worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{0, 0, -1}, 0.5,
+                                                     materials.get("ballsalmon")));
+
+  worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{1, 0, -1}, 0.25,
+                                                     materials.get("mirror")));
+
+  worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{-2, 1, -3}, 1,
+                                                     materials.get("mirror")));
+
+  worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{0, -100.5, -1}, 100,
+                                                     materials.get("ballgreen")));
+
   auto world = rt::HitableList{std::move(worldVector)};
 
   // Render the world

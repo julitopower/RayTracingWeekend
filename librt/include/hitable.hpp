@@ -4,11 +4,17 @@
 #include <vector.hpp>
 
 namespace rt {
+
+class Material;
+
 class Ray;
+
 struct Hit {
   float t;
   Vector3f p;
   Vector3f normal;
+  // TODO, don't use raw pointers
+  Material* material;
 };
 
 class Hitable {

@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <math.h>
+#include <random>
+#include <memory>
 
 namespace rt {
 
@@ -11,12 +13,12 @@ class Vector3f {
   /*!
    * \brief Default constructor
    */
-  explicit Vector3f() {}
-
+  Vector3f() {}
+  
   /*!
    * \brief Initializes the vector components
    */
-  explicit Vector3f(float v0, float v1, float v2) : v_{v0, v1, v2} {}
+  Vector3f(float v0, float v1, float v2) : v_{v0, v1, v2} {}
 
   // View components as coordinates
   const float& x() const { return v_[0]; }
@@ -179,6 +181,19 @@ inline Vector3f& Vector3f::operator/=(float t) {
 
 inline Vector3f unit_vector(Vector3f v) {
   return v / v.norm2();
+}
+
+inline Vector3f random_in_unit_sphere() {
+  Vector3f p;
+  auto dis = std::uniform_real_distribution<>{0.0, 1.0};
+  std::random_device device;
+  do {
+    p = (2.0f * Vector3f{
+      static_cast<float>(dis(device)),
+      static_cast<float>(dis(device)),
+          static_cast<float>(dis(device))}) - Vector3f{1, 1, 1};
+  } while (p.squared_length() >= 1.0f);
+  return p;
 }
 
 }
