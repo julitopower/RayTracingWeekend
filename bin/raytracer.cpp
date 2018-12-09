@@ -11,6 +11,10 @@
 #include <sphere.hpp>
 #include <material.hpp>
 
+#ifdef USE_OMP
+#include <omp.h>
+#endif
+
 
 void write_header(std::ostream& os, uint16_t width, uint16_t height) {
   os << "P3" << std::endl << width << " " << height << std::endl <<  "255" << std::endl;
@@ -50,7 +54,9 @@ void render(uint16_t width,
   auto dis = std::uniform_real_distribution<>{0.0, 1.0};
   std::random_device device;
 
+  std::vector<uint8_t> img(width * height * 3);
   for (auto i = height - 1 ; i >= 0 ; --i) {
+#pragma omp parallel for
     for (auto j = 0U; j < width; ++j) {
       rt::Vector3f color{0, 0, 0};
       for (auto a = 0U ; a < anti_alias ; ++a) {
@@ -63,9 +69,19 @@ void render(uint16_t width,
       }
       color /= static_cast<float>(anti_alias);
       color = rt::Vector3f{float(sqrt(color.x())), float(sqrt(color.y())), float(sqrt(color.z()))};
-      os  << static_cast<int>(color.x() * CONV) << " "
-          << static_cast<int>(color.y() * CONV) << " "
-          << static_cast<int>(color.z() * CONV) << " ";
+
+      img[i * width * 3 + j * 3] = static_cast<uint8_t>(color.x() * CONV);
+      img[i * width * 3 + j * 3 + 1] = static_cast<uint8_t>(color.y() * CONV);
+      img[i * width * 3 + j * 3 + 2] = static_cast<uint8_t>(color.z() * CONV);
+    }
+  }
+
+  std::cout << "here" << std::endl;
+  for (auto i = height - 1 ; i >= 0 ; --i) {
+    for (auto j = 0U; j < width; ++j) {    
+      os << +img[i * width * 3 + j * 3] << " "
+         << +img[i * width * 3 + j * 3 + 1] << " "
+         << +img[i * width * 3 + j * 3 + 2] << " ";
     }
     os << std::endl;
   }
@@ -82,6 +98,7 @@ int main(int argc, char** argv) {
   materials.register_lambertian("ballgreen", {0.8, 0.8, 0});
   materials.register_lambertian("ballsalmon", {0.8, 0.3, 0.3});
   materials.register_metal("mirror", {0.8, 1, 0.5});
+  materials.register_metal("perfectmirror", {0.5, 0.5, 0.5});  
   
   // Populate a world with Spheres
   rt::HitableList::HitablePtr worldVector;
@@ -89,7 +106,7 @@ int main(int argc, char** argv) {
                                                      materials.get("ballsalmon")));
 
   worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{1, 0, -1}, 0.25,
-                                                     materials.get("mirror")));
+                                                     materials.get("perfectmirror")));
 
   worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{-2, 1, -3}, 1,
                                                      materials.get("mirror")));

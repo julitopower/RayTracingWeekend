@@ -29,7 +29,7 @@ bool Metal::scatter(const Ray& ray,
   Vector3f reflected = reflect(unit_vector(ray.dir()), rec.normal);
   scattered = Ray{rec.p, reflected};
   attenuation = albedo_;
-  return dot(scattered.dir(), rec.normal);
+  return dot(scattered.dir(), rec.normal) > 0;
 }
 
 void MaterialRegistry::register_lambertian(const std::string& name,
