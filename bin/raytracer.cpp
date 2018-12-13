@@ -68,7 +68,7 @@ void render(uint16_t width,
         color += rt::ray_color(r, world, 0);
       }
       color /= static_cast<float>(anti_alias);
-      color = rt::Vector3f{float(sqrt(color.x())), float(sqrt(color.y())), float(sqrt(color.z()))};
+      color.sqrt();
 
       img[i * width * 3 + j * 3] = static_cast<uint8_t>(color.x() * CONV);
       img[i * width * 3 + j * 3 + 1] = static_cast<uint8_t>(color.y() * CONV);
@@ -78,7 +78,7 @@ void render(uint16_t width,
 
   std::cout << "here" << std::endl;
   for (auto i = height - 1 ; i >= 0 ; --i) {
-    for (auto j = 0U; j < width; ++j) {    
+    for (auto j = 0U; j < width; ++j) {
       os << +img[i * width * 3 + j * 3] << " "
          << +img[i * width * 3 + j * 3 + 1] << " "
          << +img[i * width * 3 + j * 3 + 2] << " ";
@@ -98,8 +98,8 @@ int main(int argc, char** argv) {
   materials.register_lambertian("ballgreen", {0.8, 0.8, 0});
   materials.register_lambertian("ballsalmon", {0.8, 0.3, 0.3});
   materials.register_metal("mirror", {0.8, 1, 0.5});
-  materials.register_metal("perfectmirror", {0.5, 0.5, 0.5});  
-  
+  materials.register_metal("perfectmirror", {0.5, 0.5, 0.5});
+
   // Populate a world with Spheres
   rt::HitableList::HitablePtr worldVector;
   worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{0, 0, -1}, 0.5,
@@ -118,5 +118,5 @@ int main(int argc, char** argv) {
 
   // Render the world
   rt::Camera cam;
-  render(800, 400, world, cam, 50, "image2.ppm");
+  render(800, 400, world, cam, 100, "image2.ppm");
 }

@@ -59,7 +59,7 @@ class Vector3f {
    * \brief Vector Norm2, or length in a euclidean space
    */
   float norm2() {
-    return sqrt(squared_length());
+    return ::sqrt(squared_length());
   }
 
   /*
@@ -69,6 +69,12 @@ class Vector3f {
     return (v_[0] * v_[0]) + (v_[1] * v_[1]) + (v_[2] * v_[2]);
   }
 
+  void sqrt() {
+    v_[0] = ::sqrt(v_[0]);
+    v_[1] = ::sqrt(v_[1]);
+    v_[2] = ::sqrt(v_[2]);
+  }
+  
   /*
    * \brief ???
    */
