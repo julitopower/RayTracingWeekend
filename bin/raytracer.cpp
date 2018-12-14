@@ -99,6 +99,7 @@ int main(int argc, char** argv) {
   materials.register_lambertian("ballsalmon", {0.8, 0.3, 0.3});
   materials.register_metal("mirror", {0.8, 1, 0.5});
   materials.register_metal("perfectmirror", {0.5, 0.5, 0.5});
+  materials.register_dielectric("transparent", 1.5);
 
   // Populate a world with Spheres
   rt::HitableList::HitablePtr worldVector;
@@ -108,8 +109,10 @@ int main(int argc, char** argv) {
   worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{1, 0, -1}, 0.25,
                                                      materials.get("perfectmirror")));
 
-  worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{-2, 1, -3}, 1,
-                                                     materials.get("mirror")));
+  worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{-1, 0.0, -1}, 0.5,
+                                                     materials.get("transparent")));
+  worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{-1, 0.0, -1}, -0.45,
+                                                     materials.get("transparent")));  
 
   worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{0, -100.5, -1}, 100,
                                                      materials.get("ballgreen")));

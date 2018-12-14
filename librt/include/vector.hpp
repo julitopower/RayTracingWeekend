@@ -33,11 +33,12 @@ class Vector3f {
   /*!
    * \brief Prefix+ is basically a no-op
    */
-  const Vector3f& operator+() {return *this; }
+  const Vector3f& operator+() const {return *this; }
+  
   /*
    * \brief Negate vector
    */
-  Vector3f operator-() { return Vector3f(-v_[0], -v_[1], -v_[2]); }
+  Vector3f operator-() const { return Vector3f(-v_[0], -v_[1], -v_[2]); }
 
   /*
    * \brief Indexing operator
@@ -58,14 +59,14 @@ class Vector3f {
   /*
    * \brief Vector Norm2, or length in a euclidean space
    */
-  float norm2() {
+  float norm2() const {
     return ::sqrt(squared_length());
   }
 
   /*
    * \brief Square of length
    */
-  float squared_length() {
+  float squared_length() const {
     return (v_[0] * v_[0]) + (v_[1] * v_[1]) + (v_[2] * v_[2]);
   }
 

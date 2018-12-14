@@ -71,6 +71,30 @@ class Metal : public Material {
   Vector3f albedo_;
 };
 
+/*!
+ * \brief A non reflecting material
+ */
+class Dielectric : public Material {
+ public:
+  /*!
+   * \brief Construct a new Lambertian material with the given attenuation vector
+   */
+  explicit Dielectric(float ri) : ref_idx_{ri} {}
+
+  /*
+   * Generate a scattered Ray in a random direction. Given an intersection point a
+   * nd a normal with unit length, the scattered ray is calculated by moving the
+   * intersection point in the direction of the normal, for the length of the
+   * normal, and then moving it along a unit vector in a random direction.
+   */
+  bool scatter(const Ray& ray,
+               const Hit& rec,
+               Vector3f& attenuation,
+               Ray& scattered) const final override;
+ private:
+  float ref_idx_;
+};
+
 class MaterialRegistry {
  public:
   MaterialRegistry() = default;
@@ -79,6 +103,9 @@ class MaterialRegistry {
   
   void register_metal(const std::string& name,
                       const Vector3f& attenuation);
+
+  void register_dielectric(const std::string& name,
+                           float ref_idx);
 
   Material* get(const std::string& name);
  private:
