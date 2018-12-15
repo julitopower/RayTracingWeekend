@@ -4,6 +4,8 @@ Simple C++ raytracer. Following the excellent "[Raytracer in a weekend](http://w
 
 # Sample images
 
+![](docs/ray_tracer_camera.png)
+
 ![](docs/ray_tracer_metal.png)
 
 ![](docs/ray_tracer_lambert.png)
