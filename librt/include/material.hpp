@@ -108,8 +108,34 @@ class MaterialRegistry {
                            float ref_idx);
 
   Material* get(const std::string& name);
+  
+  Material* generate_lambertial() {
+    auto dis = std::uniform_real_distribution<float>{0.0, 1.0};
+    std::random_device device;      
+    random_.push_back(
+        std::make_unique<Lambertian>(rt::Vector3f{dis(device) * dis(device),
+                                                  dis(device) * dis(device),
+                                                  dis(device) * dis(device)}));
+    return random_.back().get();
+  }
+
+  Material* generate_metal() {
+    auto dis = std::uniform_real_distribution<float>{0.0, 1.0};
+    std::random_device device;      
+    random_.push_back(
+        std::make_unique<Metal>(rt::Vector3f{0.5f * (1 + dis(device)),
+                0.5f * (1 + dis(device)),
+                0.5f * dis(device)}));
+    return random_.back().get();
+  }
+
+  Material* generate_dielectric() {
+    random_.push_back(std::make_unique<Dielectric>(1.5));
+    return random_.back().get();
+  }    
  private:
   std::map<std::string, std::unique_ptr<Material>> registry_;
+  std::vector<std::unique_ptr<Material>> random_;
 };
 
 } // namespace rt

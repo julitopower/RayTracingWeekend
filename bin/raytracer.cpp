@@ -15,6 +15,57 @@
 #include <omp.h>
 #endif
 
+rt::HitableList random_world(rt::MaterialRegistry& materials) {
+  rt::HitableList::HitablePtr world_vector;
+  // Floor
+  world_vector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{0, -1000, 0}, 1000.f,
+                                                      materials.get("ballgreen")));
+
+  auto dis = std::uniform_real_distribution<float>{0.0, 1.0};
+  std::random_device device;  
+
+  for(auto a = -11 ; a < 11 ; ++a) {
+    for(auto b= -11 ; b < 11 ; ++b) {
+      float choose_mat = dis(device);
+      rt::Vector3f center{a + 0.9f * dis(device), 0.2, b + 0.9f * dis(device)};
+
+      rt::Vector3f reference{4, 0.2, 0};
+      if ((center - reference).norm2() > 0.9) {
+        if (choose_mat < 0.8) {
+          world_vector.push_back(
+              std::make_unique<rt::Sphere>(center,
+                                           0.2f,
+                                           materials.generate_lambertial()));
+        } else if (choose_mat < 0.95) {
+          world_vector.push_back(
+              std::make_unique<rt::Sphere>(center,
+                                           0.2f,
+                                           materials.generate_metal()));          
+        } else {
+          world_vector.push_back(
+              std::make_unique<rt::Sphere>(center,
+                                           0.2f,
+                                           materials.generate_dielectric()));
+        }
+      }
+    }
+  }
+
+  world_vector.push_back(  
+      std::make_unique<rt::Sphere>(rt::Vector3f{0, 1, 0},
+                                   1.0f,
+                                   materials.generate_dielectric()));
+  world_vector.push_back(          
+      std::make_unique<rt::Sphere>(rt::Vector3f{-4, 1, 0},
+                                   1.0f,
+                                   materials.generate_lambertial()));
+  world_vector.push_back(          
+      std::make_unique<rt::Sphere>(rt::Vector3f{4, 1, 0},
+                                   1.0f,
+                                   materials.generate_metal()));    
+  
+  return rt::HitableList{std::move(world_vector)};
+}
 
 void write_header(std::ostream& os, uint16_t width, uint16_t height) {
   os << "P3" << std::endl << width << " " << height << std::endl <<  "255" << std::endl;
@@ -110,7 +161,7 @@ int main(int argc, char** argv) {
                                                      materials.get("perfectmirror")));
 
   worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{-1, 0.0, -1}, 0.5,
-                                                       materials.get("transparent")));
+                                                     materials.get("transparent")));
   worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{-1, 0.0, -1}, -0.45,
                                                      materials.get("transparent")));
 
@@ -120,13 +171,15 @@ int main(int argc, char** argv) {
   auto world = rt::HitableList{std::move(worldVector)};
 
   // Render the world
-  const auto lookfrom = rt::Vector3f{3, 3, 2};
-  const auto lookat = rt::Vector3f{0, 0, -1};
-  const auto dist_to_focus = (lookfrom - lookat).norm2();
-  const auto aperture = float{1.0};
+  rt::Vector3f lookfrom(13,2,3);
+  rt::Vector3f lookat(0,0,0);
+  float dist_to_focus = 10.0;
+  float aperture = 0.1;
   
-  rt::Camera cam{lookfrom, lookat, {0, 1, 0},
-            20, float(800)/float(400),
-            aperture, dist_to_focus};
-  render(800, 400, world, cam, 200, "image2.ppm");
+  rt::Camera cam(lookfrom, lookat, {0, 1, 0},
+                 20, float(800)/float(400),
+                 aperture, dist_to_focus);
+  
+  //render(800, 400, world, cam, 200, "image2.ppm");
+  render(800, 400, random_world(materials), cam, 100, "image3.ppm");  
 }
