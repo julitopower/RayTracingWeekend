@@ -110,9 +110,9 @@ int main(int argc, char** argv) {
                                                      materials.get("perfectmirror")));
 
   worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{-1, 0.0, -1}, 0.5,
-                                                     materials.get("transparent")));
+                                                       materials.get("transparent")));
   worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{-1, 0.0, -1}, -0.45,
-                                                     materials.get("transparent")));  
+                                                     materials.get("transparent")));
 
   worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{0, -100.5, -1}, 100,
                                                      materials.get("ballgreen")));
@@ -120,6 +120,6 @@ int main(int argc, char** argv) {
   auto world = rt::HitableList{std::move(worldVector)};
 
   // Render the world
-  rt::Camera cam;
-  render(800, 400, world, cam, 100, "image2.ppm");
+  rt::Camera cam{{-2, 2, 1}, {0, 0, -1}, {0, 1, 0}, 45, float(800)/float(400)};
+  render(800, 400, world, cam, 200, "image2.ppm");
 }

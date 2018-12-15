@@ -7,3 +7,26 @@ Simple C++ raytracer. Following the excellent "[Raytracer in a weekend](http://w
 ![](docs/ray_tracer_metal.png)
 
 ![](docs/ray_tracer_lambert.png)
+
+# Building
+
+This project uses CMake as its build system. Currently there is one one option:
+
+* ```USE_OMP```: Enables the use of OpenMP for parallel computation. Default is ON
+
+To make an out of source build simply execute the following from the projet's root directory:
+
+```shell
+mkdir -p build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_OMP=ON
+make
+```
+
+And now you can execute the demo program:
+
+```
+bin/raytracer
+```
+
+Which will produce two images.
