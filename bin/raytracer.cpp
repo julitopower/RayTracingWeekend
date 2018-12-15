@@ -120,6 +120,13 @@ int main(int argc, char** argv) {
   auto world = rt::HitableList{std::move(worldVector)};
 
   // Render the world
-  rt::Camera cam{{-2, 2, 1}, {0, 0, -1}, {0, 1, 0}, 45, float(800)/float(400)};
+  const auto lookfrom = rt::Vector3f{3, 3, 2};
+  const auto lookat = rt::Vector3f{0, 0, -1};
+  const auto dist_to_focus = (lookfrom - lookat).norm2();
+  const auto aperture = float{1.0};
+  
+  rt::Camera cam{lookfrom, lookat, {0, 1, 0},
+            20, float(800)/float(400),
+            aperture, dist_to_focus};
   render(800, 400, world, cam, 200, "image2.ppm");
 }

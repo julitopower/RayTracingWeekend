@@ -203,6 +203,18 @@ inline Vector3f random_in_unit_sphere() {
   return p;
 }
 
+inline Vector3f random_in_unit_disk() {
+  Vector3f p;
+  auto dis = std::uniform_real_distribution<>{0.0, 1.0};
+  std::random_device device;
+  do {
+    p = (2.0f * Vector3f{
+        static_cast<float>(dis(device)),
+        static_cast<float>(dis(device)), 0}) - Vector3f{1, 1, 0};
+  } while (dot(p, p) >= 1.0f);
+  return p;
+}
+
 }
 
 #endif // VECTOR_HPP
