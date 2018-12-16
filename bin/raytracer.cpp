@@ -15,11 +15,17 @@
 #include <omp.h>
 #endif
 
-rt::HitableList random_world(rt::MaterialRegistry& materials) {
+rt::HitableList random_world(rt::MaterialRegistry& materials,
+                             rt::TextureRegistry& textures) {
   rt::HitableList::HitablePtr world_vector;
+  textures.register_texture<rt::CheckerTexture>("checker",
+                                                rt::Vector3f{0.2, 0.3, 0.1},
+                                                rt::Vector3f{0.9, 0.9, 0.9});
+  
+  materials.register_lambertian("floor", textures.get("checker"));
   // Floor
   world_vector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{0, -1000, 0}, 1000.f,
-                                                      materials.get("ballgreen")));
+                                                      materials.get("floor")));
 
   auto dis = std::uniform_real_distribution<float>{0.0, 1.0};
   std::random_device device;  
@@ -35,7 +41,7 @@ rt::HitableList random_world(rt::MaterialRegistry& materials) {
           world_vector.push_back(
               std::make_unique<rt::Sphere>(center,
                                            0.2f,
-                                           materials.generate_lambertial()));
+                                           materials.generate_lambertial(textures)));
         } else if (choose_mat < 0.95) {
           world_vector.push_back(
               std::make_unique<rt::Sphere>(center,
@@ -58,7 +64,7 @@ rt::HitableList random_world(rt::MaterialRegistry& materials) {
   world_vector.push_back(          
       std::make_unique<rt::Sphere>(rt::Vector3f{-4, 1, 0},
                                    1.0f,
-                                   materials.generate_lambertial()));
+                                   materials.generate_lambertial(textures)));
   world_vector.push_back(          
       std::make_unique<rt::Sphere>(rt::Vector3f{4, 1, 0},
                                    1.0f,
@@ -144,10 +150,14 @@ int main(int argc, char** argv) {
   // Generate a gradient color image
   demo_draw_gradient(800, 400, "image.ppm");
 
+  // Texture registry
+  rt::TextureRegistry textures{};
+  textures.register_texture<rt::ConstantTexture>("green", rt::Vector3f{0.8, 0.8, 0});
+  textures.register_texture<rt::ConstantTexture>("salmon", rt::Vector3f{0.8, 0.3, 0.3});  
   // Register materials in the materials registry
   rt::MaterialRegistry materials{};
-  materials.register_lambertian("ballgreen", {0.8, 0.8, 0});
-  materials.register_lambertian("ballsalmon", {0.8, 0.3, 0.3});
+  materials.register_lambertian("ballgreen", textures.get("green"));
+  materials.register_lambertian("ballsalmon", textures.get("salmon"));
   materials.register_metal("mirror", {0.8, 1, 0.5});
   materials.register_metal("perfectmirror", {0.5, 0.5, 0.5});
   materials.register_dielectric("transparent", 1.5);
@@ -181,5 +191,5 @@ int main(int argc, char** argv) {
                  aperture, dist_to_focus);
   
   //render(800, 400, world, cam, 200, "image2.ppm");
-  render(800, 400, random_world(materials), cam, 100, "image3.ppm");  
+  render(800, 400, random_world(materials, textures), cam, 500, "image3.ppm");  
 }

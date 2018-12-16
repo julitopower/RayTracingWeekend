@@ -1,6 +1,7 @@
 #include <material.hpp>
 #include <ray.hpp>
 #include <vector.hpp>
+#include <texture.hpp>
 
 namespace rt{
 namespace {
@@ -37,7 +38,7 @@ bool Lambertian::scatter(const Ray& /* ray */,
                          Ray& scattered) const {
   Vector3f target = rec.p + rec.normal + random_in_unit_sphere();
   scattered = Ray{rec.p, target - rec.p};
-  attenuation = albedo_;
+  attenuation = albedo_->value(0, 0, rec.p);
   return true;
 }
 
@@ -92,7 +93,7 @@ bool Dielectric::scatter(const Ray& ray,
 }
 
 void MaterialRegistry::register_lambertian(const std::string& name,
-                                           const Vector3f& attenuation) {
+                                           Texture* attenuation) {
   registry_[name] = std::make_unique<Lambertian>(attenuation);
 }
 

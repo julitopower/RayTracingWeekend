@@ -6,11 +6,12 @@
 #include <string>
 
 #include <vector.hpp>
+#include <texture.hpp>
 
 namespace rt {
 
-class Ray;
 class Hit;
+class Ray;
 
 /*!
  * \brief Abstract representation of a material that can be associated with
@@ -43,7 +44,7 @@ class Lambertian : public Material {
   /*!
    * \brief Construct a new Lambertian material with the given attenuation vector
    */
-  explicit Lambertian(const Vector3f& a) : albedo_{a} {}
+  explicit Lambertian(Texture* a) : albedo_{a} {}
 
   /*
    * Generate a scattered Ray in a random direction. Given an intersection point a
@@ -56,7 +57,7 @@ class Lambertian : public Material {
                Vector3f& attenuation,
                Ray& scattered) const final override;
  private:
-  Vector3f albedo_;
+  Texture* albedo_;
 };
 
 class Metal : public Material {
@@ -99,7 +100,7 @@ class MaterialRegistry {
  public:
   MaterialRegistry() = default;
   void register_lambertian(const std::string& name,
-                           const Vector3f& attenuation);
+                           Texture* attenuation);
   
   void register_metal(const std::string& name,
                       const Vector3f& attenuation);
@@ -109,13 +110,8 @@ class MaterialRegistry {
 
   Material* get(const std::string& name);
   
-  Material* generate_lambertial() {
-    auto dis = std::uniform_real_distribution<float>{0.0, 1.0};
-    std::random_device device;      
-    random_.push_back(
-        std::make_unique<Lambertian>(rt::Vector3f{dis(device) * dis(device),
-                                                  dis(device) * dis(device),
-                                                  dis(device) * dis(device)}));
+  Material* generate_lambertial(rt::TextureRegistry& textures) {
+    random_.push_back(std::make_unique<Lambertian>(textures.random_color()));
     return random_.back().get();
   }
 
