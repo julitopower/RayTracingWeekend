@@ -2,6 +2,7 @@
 #include <random>
 
 #include <camera.hpp>
+#include <image.hpp>
 #include <ray.hpp>
 #include <render.hpp>
 #include <vector.hpp>
@@ -12,13 +13,19 @@
 
 namespace rt {
 
-namespace {
+void PPMWriter::write(const std::vector<uint8_t>& buffer, std::size_t width, std::size_t height) const {
+    std::ofstream os{filepath_};
+    os << "P3" << std::endl << width << " " << height << std::endl <<  "255" << std::endl;
     
-void write_header(std::ostream& os, uint16_t width, uint16_t height) {
-  os << "P3" << std::endl << width << " " << height << std::endl <<  "255" << std::endl;
+    for (std::int32_t i = height - 1 ; i >= 0 ; --i) {
+	for (auto j = 0U; j < width; ++j) {
+	    os << +buffer[i * width * 3 + j * 3] << " "
+	       << +buffer[i * width * 3 + j * 3 + 1] << " "
+	       << +buffer[i * width * 3 + j * 3 + 2] << " ";
+	}
+	os << std::endl;
+    }    
 }
-	
-} // unammed namespace    
     
 void render(uint16_t width,
             uint16_t height,
@@ -27,8 +34,6 @@ void render(uint16_t width,
             uint anti_alias,
             const std::string& filepath) {
     const auto CONV = 255.99f;
-    std::ofstream os{filepath};
-    write_header(os, width, height);
 
     auto dis = std::uniform_real_distribution<>{0.0, 1.0};
     std::random_device device;
@@ -55,14 +60,6 @@ void render(uint16_t width,
 	}
     }
 
-    std::cout << "here" << std::endl;
-    for (auto i = height - 1 ; i >= 0 ; --i) {
-	for (auto j = 0U; j < width; ++j) {
-	    os << +img[i * width * 3 + j * 3] << " "
-	       << +img[i * width * 3 + j * 3 + 1] << " "
-	       << +img[i * width * 3 + j * 3 + 2] << " ";
-	}
-	os << std::endl;
-    }
+    PPMWriter{filepath}.write(img, width, height);
 }
 } // namespace rt

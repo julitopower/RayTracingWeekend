@@ -99,18 +99,18 @@ int main(int argc, char** argv) {
   worldVector.push_back(std::make_unique<rt::Sphere>(rt::Vector3f{0, -100.5, -1}, 100,
                                                      materials.get("ballgreen")));
 
-  rt::HitableList world{std::move(worldVector)};
+  const rt::HitableList world{std::move(worldVector)};
 
   // Render the world
-  rt::Vector3f lookfrom(13,2,3);
-  rt::Vector3f lookat(0,0,0);
-  float dist_to_focus = 10.0;
-  float aperture = 0.1;
+  const rt::Vector3f lookfrom(13,2,3);
+  const rt::Vector3f lookat(0,0,0);
+  const float dist_to_focus{10.0f};
+  const float aperture{0.1f};
   
-  rt::Camera cam(lookfrom, lookat, {0, 1, 0},
-                 20, float(800)/float(400),
-                 aperture, dist_to_focus);
+  const rt::Camera cam(lookfrom, lookat, {0, 1, 0},
+		       20, float(800)/float(400),
+		       aperture, dist_to_focus);
   
-  //render(800, 400, world, cam, 200, "image2.ppm");
+  //rt::render(800, 400, world, cam, 200, "image2.ppm");
   rt::render(800, 400, random_world(materials, textures), cam, 500, "image3.ppm");  
 }
