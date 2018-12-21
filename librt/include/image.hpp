@@ -28,6 +28,7 @@ namespace rt {
 
     class PNGWriter : public FileWriter {
     public:
+	PNGWriter(const std::string& filepath) : FileWriter{filepath} {}	
 	void write(const std::vector<uint8_t>& buffer,
 		   std::size_t width,
 		   std::size_t height) const override;

@@ -111,6 +111,6 @@ int main(int argc, char** argv) {
 		       20, float(800)/float(400),
 		       aperture, dist_to_focus);
   
-  //rt::render(800, 400, world, cam, 200, "image2.ppm");
-  rt::render(800, 400, random_world(materials, textures), cam, 500, "image3.ppm");  
+  //rt::render(800, 400, world, cam, 200, "image.png");
+  rt::render(800, 400, random_world(materials, textures), cam, 500, "image.png");  
 }

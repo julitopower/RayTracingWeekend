@@ -6,4 +6,6 @@ set(SRC
   ${CMAKE_CURRENT_SOURCE_DIR}/src/material.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/render.cpp  
   )
+
 add_library(raytracing ${SRC})
+target_link_libraries(raytracing ${PNG_LIBRARIES})
