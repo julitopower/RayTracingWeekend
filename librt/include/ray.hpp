@@ -50,7 +50,7 @@ class Ray {
   Vector3f dir_;
 };
 
-rt::Vector3f ray_color(const rt::Ray& r, const Hitable& world, int depth);
+Vector3f ray_color(const rt::Ray& r, const Hitable& world, int depth, bool background);
 
 }
 

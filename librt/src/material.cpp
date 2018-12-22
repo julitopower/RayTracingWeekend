@@ -17,10 +17,10 @@ inline bool refract(const Vector3f& v, const Vector3f& n, float ni_over_nt, Vect
     float dt = dot(uv, n);
     float dis = 1.0 - ni_over_nt * ni_over_nt * (1 - dt * dt);
     if (dis > 0) {
-        refracted = ni_over_nt * (uv - n * dt) - n * sqrt(dis);
-        return true;
+	refracted = ni_over_nt * (uv - n * dt) - n * sqrt(dis);
+	return true;
     } else {
-        return false;
+	return false;
     }
 }
 
@@ -33,9 +33,9 @@ float schlick(float cosine, float ref_idx) {
 } // Unnamed namespace
 
 bool Lambertian::scatter(const Ray& /* ray */,
-                         const Hit& rec,
-                         Vector3f& attenuation,
-                         Ray& scattered) const {
+			 const Hit& rec,
+			 Vector3f& attenuation,
+			 Ray& scattered) const {
   Vector3f target = rec.p + rec.normal + random_in_unit_sphere();
   scattered = Ray{rec.p, target - rec.p};
   attenuation = albedo_->value(0, 0, rec.p);
@@ -43,9 +43,9 @@ bool Lambertian::scatter(const Ray& /* ray */,
 }
 
 bool Metal::scatter(const Ray& ray,
-                   const Hit& rec,
-                   Vector3f& attenuation,
-                   Ray& scattered) const {
+		   const Hit& rec,
+		   Vector3f& attenuation,
+		   Ray& scattered) const {
   Vector3f reflected = reflect(unit_vector(ray.dir()), rec.normal);
   scattered = Ray{rec.p, reflected};
   attenuation = albedo_;
@@ -53,9 +53,9 @@ bool Metal::scatter(const Ray& ray,
 }
 
 bool Dielectric::scatter(const Ray& ray,
-                   const Hit& rec,
-                   Vector3f& attenuation,
-                   Ray& scattered) const {
+		   const Hit& rec,
+		   Vector3f& attenuation,
+		   Ray& scattered) const {
   Vector3f outward_normal;
   Vector3f reflected = reflect(ray.dir(), rec.normal);
   float ni_over_nt;
@@ -86,25 +86,30 @@ bool Dielectric::scatter(const Ray& ray,
   if(dis(device) < reflect_prob) {
     scattered = Ray{rec.p, reflected};
   } else {
-    scattered = Ray{rec.p, refracted};    
+    scattered = Ray{rec.p, refracted};
   }
-  
+
   return true;
 }
 
 void MaterialRegistry::register_lambertian(const std::string& name,
-                                           Texture* attenuation) {
+					   Texture* attenuation) {
   registry_[name] = std::make_unique<Lambertian>(attenuation);
 }
 
 void MaterialRegistry::register_metal(const std::string& name,
-                                      const Vector3f& attenuation) {
+				      const Vector3f& attenuation) {
     registry_[name] = std::make_unique<Metal>(attenuation);
 }
 
 void MaterialRegistry::register_dielectric(const std::string& name,
-                                           float ref_idx) {
+					   float ref_idx) {
   registry_[name] = std::make_unique<Dielectric>(ref_idx);
+}
+
+void MaterialRegistry::register_light(const std::string& name,
+				      const Vector3f& color) {
+  registry_[name] = std::make_unique<Light>(color);
 }
 
 Material* MaterialRegistry::get(const std::string& name) {

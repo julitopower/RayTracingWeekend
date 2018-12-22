@@ -20,7 +20,7 @@ include_directories(${PNG_INCLUDE_DIR})
 option(USE_OMP "Use omp for parallelism" ON)
 if(${USE_OMP})
   add_definitions(-DUSE_OMP)
-  set(CMAKE_CXX_FLAGS -fopenmp)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 endif(${USE_OMP})
 
 add_subdirectory(librt)

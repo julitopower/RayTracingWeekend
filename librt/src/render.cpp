@@ -78,29 +78,34 @@ void PNGWriter::write(const std::vector<uint8_t>& buffer, std::size_t width, std
     png_destroy_write_struct(&png_ptr, &png_info_ptr);
 }    
     
-void render(uint16_t width,
-            uint16_t height,
+void render(std::uint16_t width,
+	    std::uint16_t height,
             const Hitable& world,
             const Camera& cam,
-            uint anti_alias,
-            const std::string& filepath) {
+            std::uint16_t anti_alias,
+            const std::string& filepath,
+	    bool background) {
+    // Conversion factor to go from float to unsigned char for RGB components
     const auto CONV = 255.99f;
 
     auto dis = std::uniform_real_distribution<>{0.0, 1.0};
     std::random_device device;
 
+    // Image buffer. Preallocate the entire image to facilitate
+    // parallelism
     std::vector<uint8_t> img(width * height * 3);
     for (auto i = height - 1 ; i >= 0 ; --i) {
         #pragma omp parallel for
 	for (auto j = 0U; j < width; ++j) {
 	    rt::Vector3f color{0, 0, 0};
 	    for (auto a = 0U ; a < anti_alias ; ++a) {
-
+		// For the anti-alias we generate random rays around the fixed
+		// grid. This also enables soft shadows
 		auto u = static_cast<float>(j + dis(device)) / width;
 		auto v = static_cast<float>(i + dis(device)) / height;
 
 		auto r = cam.ray(u,v);
-		color += rt::ray_color(r, world, 0);
+		color += rt::ray_color(r, world, 0, background);
 	    }
 	    color /= static_cast<float>(anti_alias);
 	    color.sqrt();

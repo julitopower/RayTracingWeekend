@@ -29,11 +29,32 @@ class Material {
    * \return
    */
   virtual bool scatter(const Ray& ray,
-                       const Hit& hit,
-                       Vector3f&  attenuation,
-                       Ray& scattered) const = 0;
+		       const Hit& hit,
+		       Vector3f&  attenuation,
+		       Ray& scattered) const = 0;
+
+    virtual Vector3f emmitted() const {
+	return {0,0,0};
+    }
 
   virtual ~Material(){};
+};
+
+class Light : public Material {
+public:
+  Light(const Vector3f& color) : color_{color} {}
+  bool scatter(const Ray& ray,
+	       const Hit& rec,
+	       Vector3f& attenuation,
+	       Ray& scattered) const final override {
+      return false;
+  }
+
+  Vector3f emmitted() const final override {
+      return color_;
+  }
+private:
+    Vector3f color_;
 };
 
 /*!
@@ -53,9 +74,9 @@ class Lambertian : public Material {
    * normal, and then moving it along a unit vector in a random direction.
    */
   bool scatter(const Ray& ray,
-               const Hit& rec,
-               Vector3f& attenuation,
-               Ray& scattered) const final override;
+	       const Hit& rec,
+	       Vector3f& attenuation,
+	       Ray& scattered) const final override;
  private:
   Texture* albedo_;
 };
@@ -65,9 +86,9 @@ class Metal : public Material {
   explicit Metal(const Vector3f& a) : albedo_{a}{}
 
   bool scatter(const Ray& ray,
-               const Hit& rec,
-               Vector3f& attenuation,
-               Ray& scattered) const final override;
+	       const Hit& rec,
+	       Vector3f& attenuation,
+	       Ray& scattered) const final override;
  private:
   Vector3f albedo_;
 };
@@ -89,9 +110,9 @@ class Dielectric : public Material {
    * normal, and then moving it along a unit vector in a random direction.
    */
   bool scatter(const Ray& ray,
-               const Hit& rec,
-               Vector3f& attenuation,
-               Ray& scattered) const final override;
+	       const Hit& rec,
+	       Vector3f& attenuation,
+	       Ray& scattered) const final override;
  private:
   float ref_idx_;
 };
@@ -100,16 +121,20 @@ class MaterialRegistry {
  public:
   MaterialRegistry() = default;
   void register_lambertian(const std::string& name,
-                           Texture* attenuation);
-  
+			   Texture* attenuation);
+
   void register_metal(const std::string& name,
-                      const Vector3f& attenuation);
+		      const Vector3f& attenuation);
 
   void register_dielectric(const std::string& name,
-                           float ref_idx);
+			   float ref_idx);
+
+  void register_light(const std::string& name,
+		      const Vector3f& color);
+
 
   Material* get(const std::string& name);
-  
+
   Material* generate_lambertial(rt::TextureRegistry& textures) {
     random_.push_back(std::make_unique<Lambertian>(textures.random_color()));
     return random_.back().get();
@@ -117,18 +142,18 @@ class MaterialRegistry {
 
   Material* generate_metal() {
     auto dis = std::uniform_real_distribution<float>{0.0, 1.0};
-    std::random_device device;      
+    std::random_device device;
     random_.push_back(
-        std::make_unique<Metal>(rt::Vector3f{0.5f * (1 + dis(device)),
-                0.5f * (1 + dis(device)),
-                0.5f * dis(device)}));
+	std::make_unique<Metal>(rt::Vector3f{0.5f * (1 + dis(device)),
+		0.5f * (1 + dis(device)),
+		0.5f * dis(device)}));
     return random_.back().get();
   }
 
   Material* generate_dielectric() {
     random_.push_back(std::make_unique<Dielectric>(1.5));
     return random_.back().get();
-  }    
+  }
  private:
   std::map<std::string, std::unique_ptr<Material>> registry_;
   std::vector<std::unique_ptr<Material>> random_;
